@@ -9,7 +9,7 @@ namespace ParkApi.Models
     [StringLength(20)]
     public string Name { get; set; }
     [Required]
-    public string State { get; set; }
+    public string Type { get; set; }
     [Required]
     [Range(0, 200, ErrorMessage = "Age must be between 0 and 200.")]
     public int FoundedIn { get; set; }

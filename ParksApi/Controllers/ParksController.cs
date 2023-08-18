@@ -77,9 +77,9 @@ public class ParksController : ControllerBase
 
         return NoContent();
     }
-    //api/parks?name=[enterName]&state=[state]&foundedin=[year]
+    //api/parks?name=[enterName]&type=[type]&foundedin=[year]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Park>>> Get(string name, string state, int foundedIn)
+    public async Task<ActionResult<IEnumerable<Park>>> Get(string name, string type, int foundedIn)
     {
         IQueryable<Park> query = _db.Parks.AsQueryable();
 
@@ -87,9 +87,9 @@ public class ParksController : ControllerBase
         {
             query = query.Where(entry => entry.Name == name);
         }
-        if (state != null)
+        if (type != null)
         {
-            query = query.Where(entry => entry.State == state);
+            query = query.Where(entry => entry.Type == type);
         }
         if (foundedIn != 0)
         {
