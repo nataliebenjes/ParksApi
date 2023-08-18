@@ -4,6 +4,17 @@ namespace ParkApi.Models
 {
   public class ParkApiContext : DbContext
   {
+    //new code here for auth
+    protected readonly IConfiguration Configuration;
+    public ParkApiContext(IConfiguration configuration)
+    {
+      Configuration = configuration;
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+      options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+    }
+    //end new auth code
     public DbSet<Park> Parks { get; set; }
 
     public ParkApiContext(DbContextOptions<ParkApiContext> options) : base(options)
@@ -16,7 +27,7 @@ namespace ParkApi.Models
         .HasData(
           new Park { ParkId = 1, Name = "Grand Canyon", Type = "National", FoundedIn = 1932 },
           new Park { ParkId = 2, Name = "Zion", Type = "National", FoundedIn = 1919 },
-          new Park { ParkId = 3, Name = "Bryce", Type = "National", FoundedIn = 1938},
+          new Park { ParkId = 3, Name = "Bryce", Type = "National", FoundedIn = 1938 },
           new Park { ParkId = 4, Name = "Rocky Mountain", Type = "National", FoundedIn = 1915 },
           new Park { ParkId = 5, Name = "Olympic Penninsula", Type = "National", FoundedIn = 1938 },
           new Park { ParkId = 6, Name = "Silver Falls", Type = "State", FoundedIn = 1933 },
