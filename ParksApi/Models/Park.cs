@@ -11,7 +11,7 @@ namespace ParkApi.Models
     [Required]
     public string Type { get; set; }
     [Required]
-    [Range(0, 200, ErrorMessage = "Age must be between 0 and 200.")]
+    [Range(0, 2023, ErrorMessage = "This park hasn't been founded yet")]
     public int FoundedIn { get; set; }
   }
 }

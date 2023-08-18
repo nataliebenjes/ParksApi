@@ -16,7 +16,7 @@ namespace ParkApi.Models
         .HasData(
           new Park { ParkId = 1, Name = "Grand Canyon", Type = "National", FoundedIn = 1932 },
           new Park { ParkId = 2, Name = "Zion", Type = "National", FoundedIn = 1919 },
-          new Park { ParkId = 1928, Name = "Bryce", Type = "National", FoundedIn = 2 },
+          new Park { ParkId = 3, Name = "Bryce", Type = "National", FoundedIn = 1938},
           new Park { ParkId = 4, Name = "Rocky Mountain", Type = "National", FoundedIn = 1915 },
           new Park { ParkId = 5, Name = "Olympic Penninsula", Type = "National", FoundedIn = 1938 },
           new Park { ParkId = 6, Name = "Silver Falls", Type = "State", FoundedIn = 1933 },
