@@ -1,30 +1,39 @@
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ParksApi.Cache;
+using ParksApi.Models;
 
-using ParkApi.Models;
+namespace ParksApi.Controllers;
 
-namespace Parks.Controllers;
-
-[ApiController]
+[ApiController, Authorize]
 [Route("[controller]")]
-public class ParksController : ControllerBase
+public class ParksApiController : ControllerBase
 {
-    private readonly ParkApiContext _db;
-    public ParksController(ParkApiContext db)
+    private readonly ParksApiContext _db;
+    private readonly ICacheService _cacheService;
+
+    public ParksApiController(ParksApiContext db, ICacheService cacheService)
     {
         _db = db;
+        _cacheService = cacheService;
     }
+
     //GET: api/Parks/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Park>> GetPark(int id)
-    {
-        Park park = await _db.Parks.FindAsync(id);
 
-        if (park == null)
+    {
+        var parkCache = new Park();
+        var parkCacheList = new List<Park>();
+        parkCacheList = _cacheService.GetData<List<Park>>("Park");
+        parkCache = parkCacheList.Find(x => x.ParkId == id);
+        if (parkCache == null)
         {
-            return NotFound();
+            parkCache = await _db.Parks.FindAsync(id);
         }
-        return park;
+        return parkCache;
     }
     // api/parks
     [HttpPost]
@@ -32,15 +41,19 @@ public class ParksController : ControllerBase
     {
         _db.Parks.Add(park);
         await _db.SaveChangesAsync();
+        _cacheService.RemoveData("Park");
         return CreatedAtAction(nameof(GetPark), new { id = park.ParkId }, park);
     }
+
     [HttpPut("id")]
-    public async Task<IActionResult> Put(int id, Park park)
+    public async Task<ActionResult<IEnumerable<Park>>> Put(int id, Park park)
+
     {
         if (id != park.ParkId)
         {
             return BadRequest();
         }
+        _cacheService.RemoveData("Park");
         _db.Parks.Update(park);
 
         try
@@ -64,15 +77,17 @@ public class ParksController : ControllerBase
     {
         return _db.Parks.Any(e => e.ParkId == id);
     }
+
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePark(int id)
+    public async Task<ActionResult<IEnumerable<Park>>> DeletePark(int id)
     {
-        Park park = await _db.Parks.FindAsync(id);
+        var park = await _db.Parks.FindAsync(id);
         if (park == null)
         {
             return NotFound();
         }
         _db.Parks.Remove(park);
+        _cacheService.RemoveData("Park");
         await _db.SaveChangesAsync();
 
         return NoContent();
@@ -81,23 +96,55 @@ public class ParksController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Park>>> Get(string name, string type, int foundedIn)
     {
-        IQueryable<Park> query = _db.Parks.AsQueryable();
+        var parkCache = new List<Park>();
+        parkCache = _cacheService.GetData<List<Park>>("Park");
+        if (parkCache == null)
+        {
+            var park = await _db.Parks.ToListAsync();
+            if (park.Count > 0)
+            {
+                parkCache = park;
+                var expirationTime = DateTimeOffset.Now.AddMinutes(3.0);
+                _cacheService.SetData("Park", parkCache, expirationTime);
+            }
 
-        if (name != null)
-        {
-            query = query.Where(entry => entry.Name == name);
         }
-        if (type != null)
-        {
-            query = query.Where(entry => entry.Type == type);
-        }
-        if (foundedIn != 0)
-        {
-            query = query.Where(entry => entry.FoundedIn == foundedIn);
-        }
+        return parkCache;
 
-        return await query.ToListAsync();
+        // IQueryable<Park> query = _db.Parks.AsQueryable();
+
+        // if (name != null)
+        // {
+        //     query = query.Where(entry => entry.Name == name);
+        // }
+        // if (type != null)
+        // {
+        //     query = query.Where(entry => entry.Type == type);
+        // }
+        // if (foundedIn != 0)
+        // {
+        //     query = query.Where(entry => entry.FoundedIn == foundedIn);
+        // }
+
+        // return await query.ToListAsync();
     }
+
+    //api/parks/parkdetail
+    [HttpGet]
+    [Route("ParkDetail")]
+    public async Task<ActionResult<Park>> Get(int id)
+    {
+        var parkCache = new Park();
+        var ParkCacheList = new List<Park>();
+        ParkCacheList = _cacheService.GetData<List<Park>>("Park");
+        parkCache = ParkCacheList.Find(x => x.ParkId == id);
+        if (parkCache == null)
+        {
+            parkCache = await _db.Parks.FindAsync(id);
+        }
+        return parkCache;
+    }
+
 
 
 }

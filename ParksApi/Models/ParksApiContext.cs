@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace ParkApi.Models
+namespace ParksApi.Models
 {
-  public class ParkApiContext : DbContext
+  public class ParksApiContext : DbContext
   {
     //new code here for auth
     protected readonly IConfiguration Configuration;
-    public ParkApiContext(IConfiguration configuration)
+    public ParksApiContext(IConfiguration configuration)
     {
       Configuration = configuration;
     }
@@ -17,9 +17,9 @@ namespace ParkApi.Models
     //end new auth code
     public DbSet<Park> Parks { get; set; }
 
-    public ParkApiContext(DbContextOptions<ParkApiContext> options) : base(options)
-    {
-    }
+    // public ParksApiContext(DbContextOptions<ParksApiContext> options) : base(options)
+    // {
+    // }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
