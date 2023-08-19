@@ -1,3 +1,5 @@
+follows tutorial that uses alternative database engine. Find out which one to use and configure appsettings.json file appropriately 
+
 appsettings.json
 
 Current bugs:
@@ -19,6 +21,8 @@ GET: https://localhost:7277/Parks/[id]
 
 Post a new park:
 POST: https://localhost:7277/Parks/
+
+
 
 
 
